@@ -1,0 +1,44 @@
+version: "3"
+services:
+  app:
+    tty: true
+    command: python manage.py runserver 0.0.0.0:8100
+    build: .
+    environment:
+      DEBUG: 1
+      LOG_LEVEL: DEBUG
+    networks:
+      - app
+      - db
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - redis
+      - db
+    ports:
+      - "8100:8100"
+
+  redis:
+    image: redis:5
+    networks:
+      - app
+
+  db:
+    image: postgres:16.4
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_DB: postgres
+    networks:
+      - db
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
+
+networks:
+  app:
+  db:
